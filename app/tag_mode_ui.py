@@ -13,10 +13,10 @@ TAG_MODE_LABELS: dict[str, str] = {
     "preset_nsfw": "NSFW",
     "preset_furry_sfw": "Furry SFW",
     "preset_furry_nsfw": "Furry NSFW",
-    "auto": "Авто",
-    "free": "Свободно",
-    "custom": "Свой список",
-    "hybrid": "Быстрая CLIP",
+    "auto": "Auto",
+    "free": "Free",
+    "custom": "Custom list",
+    "hybrid": "Fast CLIP",
 }
 
 TAG_MODE_VALUES: dict[str, str] = {v: k for k, v in TAG_MODE_LABELS.items()}
@@ -33,27 +33,27 @@ FLEXIBLE_TAG_MODES: tuple[str, ...] = ("auto", "free", "custom", "hybrid")
 MODES_USING_CUSTOM_LIST: frozenset[str] = frozenset({"custom", "hybrid"})
 
 CLIP_DEVICE_LABELS: dict[str, str] = {
-    "auto": "Авто",
+    "auto": "Auto",
     "cuda": "GPU",
     "cpu": "CPU",
 }
 CLIP_DEVICE_VALUES: dict[str, str] = {v: k for k, v in CLIP_DEVICE_LABELS.items()}
 
 CLIP_QUALITY_LABELS: dict[str, str] = {
-    "fast": "Быстро",
-    "balanced": "Баланс",
-    "max": "Макс",
-    "ultra": "Ультра",
+    "fast": "Fast",
+    "balanced": "Balanced",
+    "max": "Max",
+    "ultra": "Ultra",
 }
 CLIP_QUALITY_VALUES: dict[str, str] = {v: k for k, v in CLIP_QUALITY_LABELS.items()}
 
 CLIP_QUALITY_ORDER: tuple[str, ...] = ("fast", "balanced", "max", "ultra")
 
 CLIP_QUALITY_HINTS: dict[str, str] = {
-    "fast": "ViT-B-32, без кропов — максимальная скорость.",
-    "balanced": "ViT-B-16, 3 кропа — компромисс скорость/точность.",
-    "max": "ViT-L-14, 5 кропов — высокая точность.",
-    "ultra": "ViT-L-14, 576px, 9 кропов — максимальная точность (медленнее).",
+    "fast": "ViT-B-32, no crops — maximum speed.",
+    "balanced": "ViT-B-16, 3 crops — balanced speed and accuracy.",
+    "max": "ViT-L-14, 5 crops — high accuracy.",
+    "ultra": "ViT-L-14, 576px, 9 crops — maximum accuracy (slower).",
 }
 
 
@@ -75,8 +75,8 @@ def clip_device_status_line() -> str:
             name = torch.cuda.get_device_name(0)
             return f"PyTorch {ver}: GPU {name}"
         if "+cpu" in str(ver):
-            return f"PyTorch {ver}: только CPU (для RTX: requirements-gpu.txt)"
-        return f"PyTorch {ver}: CUDA недоступна"
+            return f"PyTorch {ver}: CPU only (for RTX: requirements-gpu.txt)"
+        return f"PyTorch {ver}: CUDA unavailable"
     except Exception:
         return ""
 
@@ -113,14 +113,14 @@ def build_tag_mode_hint(
             hint = CLIP_QUALITY_HINTS.get(clip_quality, "")
             model_line = f"{describe_clip_settings(fc)} {hint}".strip()
         except Exception:
-            model_line = f"Профиль качества: {q_lbl}."
+            model_line = f"Quality profile: {q_lbl}."
         try:
             from app.paths import project_tmp_dir
 
-            cache_line = f"Кеш: {project_tmp_dir()}"
+            cache_line = f"Cache: {project_tmp_dir()}"
         except Exception:
             cache_line = ""
-        extra = f"Устройство CLIP: {dev_lbl}. {model_line}"
+        extra = f"CLIP device: {dev_lbl}. {model_line}"
         if cuda_line:
             extra = f"{extra} {cuda_line}"
         if cache_line:
