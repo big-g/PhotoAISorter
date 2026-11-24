@@ -90,5 +90,5 @@ def ensure_clip_ready(
 
     line = f"{describe_clip_settings(s)} File: {path.name}."
     if on_log:
-        on_log(f"CLIP: готово. {line}")
+        on_log(f"CLIP: ready. {line}")
     return True, line
