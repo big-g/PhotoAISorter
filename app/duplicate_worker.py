@@ -163,8 +163,8 @@ class DuplicateFinderWorker:
                         {
                             "type": "log",
                             "text": (
-                                "Дубликаты: быстрый точный режим пропустил "
-                                f"{skipped_unique_sizes} файлов с уникальным размером без чтения содержимого."
+                                "Duplicates: fast exact mode skipped "
+                                f"{skipped_unique_sizes} files with unique file sizes without reading their contents."
                             ),
                         }
                     )
@@ -251,7 +251,7 @@ class DuplicateFinderWorker:
                 self._emit(
                     {
                         "type": "log",
-                        "text": f"LLM: кандидатов пар (по корзинам размеров, max {max_pairs}): {len(pairs)}",
+                        "text": f"LLM: candidate pairs (by size buckets, max {max_pairs}): {len(pairs)}",
                     }
                 )
 
@@ -315,7 +315,7 @@ class DuplicateFinderWorker:
                 merged_llm = self.sig_db.list_llm_pair_decisions(session_key)
                 merged_llm.update(llm_cache)
 
-            self._emit({"type": "log", "text": "Дубликаты: сборка групп…"})
+            self._emit({"type": "log", "text": "Duplicates: building groups…"})
             self._emit_stage("grouping", 0, 1)
 
             groups = build_groups_from_records(
@@ -328,7 +328,7 @@ class DuplicateFinderWorker:
             self._emit_stage("grouping", 1, 1)
 
             pairs_est, max_b = hamming_matrix_stats(records)
-            self._emit({"type": "log", "text": f"Дубликаты: групп {len(groups)}, файлов {len(records)}, пар ~{pairs_est}, max корзина {max_b}"})
+            self._emit({"type": "log", "text": f"Duplicates: {len(groups)} groups, {len(records)} files, ~{pairs_est} pairs, max bucket {max_b}"})
             serial_groups = [{"paths": [str(x) for x in g.paths], "suggested_keep": str(g.suggested_keep), "is_exact": g.is_exact} for g in groups]
             serial_records = [{"path": str(r.path), "path_norm": r.path_norm, "size_bytes": r.size_bytes, "mtime_ns": r.mtime_ns, "width": r.width, "height": r.height, "sha256": r.sha256} for r in records]
             self._emit({"type": "dup_groups_ready", "groups": serial_groups, "records": serial_records, "records_count": len(records)})
