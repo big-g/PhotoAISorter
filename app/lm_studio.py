@@ -422,7 +422,7 @@ def _run_completion_retries(
             if on_retry:
                 on_retry(
                     f"{attempt_label} {attempt}/{retries}: {e!s} "
-                    f"(через {jittered_delay:.1f} с)"
+                    f"(after {jittered_delay:.1f} s)"
                 )
             time.sleep(jittered_delay)
     assert last_exc is not None
@@ -446,7 +446,7 @@ _strip_thinking_sections = strip_thinking_sections
 
 def _extract_assistant_text(msg: dict[str, Any]) -> str:
     """
-    OpenAI-совместимый ответ: content. У Qwen3/LM Studio часто пусто, текст в reasoning_content.
+    OpenAI-compatible response: content. With Qwen3/LM Studio, content may be empty and the text may be in reasoning_content.
     """
     text = _strip_thinking_sections(_normalize_content_field(msg.get("content")).strip())
     if text:
@@ -610,7 +610,7 @@ def chat_completion_cfg(
             max_tokens=max_tokens,
         ),
         on_retry=on_retry,
-        attempt_label="Повтор",
+        attempt_label="Retry",
     )
 
 
@@ -644,7 +644,7 @@ def chat_completion_multi_cfg(
             max_tokens=max_tokens,
         ),
         on_retry=on_retry,
-        attempt_label="Повтор multi",
+        attempt_label="Retry multi",
     )
 
 
@@ -824,7 +824,7 @@ def build_messages_multi(
     prompt_extra: str = "",
     structured_output: bool = False,
 ) -> list[dict[str, Any]]:
-    """Legacy: Several frames from one video/GIF — один тег на весь контент."""
+    """Legacy: several frames from one video/GIF — one tag for the entire content."""
     legacy_cfg = _legacy_resolved_cfg(
         user_context,
         free_mode=free_mode,
@@ -989,7 +989,7 @@ def chat_completion_multi(
     temperature: float = 0.2,
     max_tokens: int = CHAT_COMPLETION_MAX_TOKENS,
 ) -> str:
-    """Multi-image POST с теми же ретраями, что и chat_completion."""
+    """Multi-image POST with the same retry logic as chat_completion."""
     t = timeout if timeout is not None else (REQUEST_CONNECT_TIMEOUT_SEC, REQUEST_READ_TIMEOUT_SEC)
     return _run_completion_retries(
         lambda: _chat_completion_multi_once(
@@ -1010,7 +1010,7 @@ def chat_completion_multi(
             max_tokens=max_tokens,
         ),
         on_retry=on_retry,
-        attempt_label="Повтор multi",
+        attempt_label="Retry multi",
     )
 
 
@@ -1032,8 +1032,8 @@ def classify_frames(
     prompt_extra: str = "",
 ) -> str:
     """
-    Классификация по кадрам: multi-image → сужение до 1 кадра → покадровые запросы + merge по приоритету.
-    Возвращает нормализованный тег (строка whitelist).
+    Frame-based classification: multi-image → narrow to one frame → per-frame requests + priority-based merge.
+    Returns a normalized tag (whitelist string).
     """
     from app.categorizer import merge_tags_by_priority, normalize_tag, normalize_tag_auto, normalize_tag_free
 
@@ -1199,8 +1199,8 @@ def chat_completion(
     max_tokens: int = CHAT_COMPLETION_MAX_TOKENS,
 ) -> str:
     """
-    POST /v1/chat/completions с ретраями при таймаутах/502/503/429 и пустом ответе.
-    timeout: (connect, read); по умолчанию из constants.
+    POST /v1/chat/completions with retries on timeouts/502/503/429 and empty responses.
+    timeout: (connect, read); defaults are defined in constants.
     """
     t = timeout if timeout is not None else (REQUEST_CONNECT_TIMEOUT_SEC, REQUEST_READ_TIMEOUT_SEC)
     return _run_completion_retries(
@@ -1222,7 +1222,7 @@ def chat_completion(
             max_tokens=max_tokens,
         ),
         on_retry=on_retry,
-        attempt_label="Повтор",
+        attempt_label="Retry",
     )
 
 
@@ -1313,7 +1313,7 @@ def vision_probe_completion(
                 else API_RETRY_BACKOFF_SEC[-1]
             )
             if on_retry:
-                on_retry(f"Повтор probe {attempt}/{API_MAX_RETRIES}: {e!s} (через {delay:.0f} с)")
+                on_retry(f"Retry probe {attempt}/{API_MAX_RETRIES}: {e!s} (after {delay:.0f} s)")
             time.sleep(delay)
     assert last_exc is not None
     raise last_exc
@@ -1592,19 +1592,19 @@ def validate_model_for_sort(
     if not is_valid_ui_model_id(model):
         return (
             False,
-            "Модель не выбрана. Нажмите «Обновить список моделей» и выберите загруженную "
-            "vision-модель, либо введите её ID вручную.",
+            "No model selected. Click “Refresh model list” and select a loaded "
+            "vision model, or enter its ID manually.",
         )
     if model.strip() == DEFAULT_MODEL:
         return (
             False,
-            f"Используется placeholder «{DEFAULT_MODEL}» — в LM Studio загрузите модель и "
-            "выберите её в списке (не оставляйте подсказку «— нажмите Обновить…»).",
+            f"The placeholder “{DEFAULT_MODEL}” is being used — load a model in LM Studio and "
+            "select it from the list (do not leave the “— click Refresh…” placeholder).",
         )
     try:
         models = list_models(api_base, api_key=api_key, timeout=timeout)
     except Exception as e:
-        return False, f"LM Studio недоступен ({normalize_api_base(api_base)}): {e!s}"
+        return False, f"LM Studio is unavailable ({normalize_api_base(api_base)}): {e!s}"
 
     canonical = canonical_model_id(api_base, model, api_key=api_key, timeout=timeout)
     if canonical in models:
@@ -1621,8 +1621,8 @@ def validate_model_for_sort(
     sample = ", ".join(models[:4]) + ("…" if len(models) > 4 else "")
     return (
         False,
-        f"Модель «{model}» не найдена в /v1/models ({len(models)} шт.). "
-        f"Загрузите модель в LM Studio и обновите список. Доступно: {sample or '—'}",
+        f"Model “{model}” not found in /v1/models ({len(models)}). "
+        f"Load a model in LM Studio and refresh the list. Available: {sample or '—'}",
     )
 
 
@@ -1675,7 +1675,7 @@ def vision_self_test(
     if image_path is not None:
         p = Path(image_path)
         if not p.is_file():
-            return False, f"Файл не найден: {p}"
+            return False, f"File not found: {p}"
         try:
             suf = p.suffix.lower()
             if suf in VIDEO_EXTENSIONS or suf == GIF_EXTENSION:
@@ -1686,7 +1686,7 @@ def vision_self_test(
                 else:
                     frames = extract_frames_for_classification(p, 1, on_log=lambda _m: None)
                     if not frames:
-                        return False, "Не удалось извлечь кадр (установите ffmpeg или проверьте файл)."
+                        return False, "Could not extract a frame (install ffmpeg or check the file)."
                     uri = pil_image_to_jpeg_data_uri(frames[0])
             else:
                 uri = image_to_jpeg_base64_data_uri(p)
@@ -1729,7 +1729,7 @@ def full_api_self_test(
         lines.append(f"Endpoint GET {path}: {status} {reason}".strip())
     try:
         models = list_models(api_base, api_key=api_key)
-        lines.append(f"Моделей в /v1/models: {len(models)}")
+        lines.append(f"Models in /v1/models: {len(models)}")
     except Exception as e:
         return False, f"GET /v1/models: {e!s}"
 
@@ -1738,18 +1738,18 @@ def full_api_self_test(
         if meta:
             hint = vision_hint_from_model_dict(meta)
             if hint is True:
-                lines.append("Метаданные: похоже на vision-модель.")
+                lines.append("Metadata: appears to be a vision model.")
             elif hint is False:
-                lines.append("Метаданные: похоже на текстовую модель.")
+                lines.append("Metadata: appears to be a text model.")
             else:
-                lines.append("Метаданные: признак vision не указан — проверка запросом.")
+                lines.append("Metadata: vision capability not indicated — will test with a request.")
         else:
-            lines.append(f"Модель «{model}» не найдена в списке (всё равно пробуем vision).")
+            lines.append(f"Model “{model}” not found in the list (will still try vision).")
 
     lines.append(
-        "Проверка vision: встроенная тест-карта"
+        "Vision test: built-in test card"
         if image_path is None
-        else f"Проверка vision: файл {image_path}"
+        else f"Vision test: image file {image_path}"
     )
     ok, detail = vision_self_test(
         api_base,
@@ -1757,7 +1757,7 @@ def full_api_self_test(
         api_key=api_key,
         image_path=image_path,
     )
-    lines.append("Vision POST /v1/chat/completions (probe): " + ("OK" if ok else "ошибка"))
+    lines.append("Vision POST /v1/chat/completions (probe): " + ("OK" if ok else "error"))
     lines.append(detail)
     return ok, "\n".join(lines)
 
@@ -1841,7 +1841,7 @@ def pair_images_duplicate_decision(
             timeout=t,
         ),
         on_retry=on_retry,
-        attempt_label="Повтор dup pair",
+        attempt_label="Retry dup pair",
     )
     u = _strip_thinking_sections(raw).strip().upper()
     words = u.split()
