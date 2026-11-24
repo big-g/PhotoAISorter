@@ -305,8 +305,8 @@ class SortWorker:
                         {
                             "type": "log",
                             "text": (
-                                f"Папка результата внутри источника: пропущено уже лежащих "
-                                f"в результате файлов: {skipped_outputs}."
+                                f"Output folder inside source: skipped existing "
+                                f"output files: {skipped_outputs}."
                             ),
                         }
                     )
@@ -388,9 +388,9 @@ class SortWorker:
                     {
                         "type": "log",
                         "text": (
-                            f"Endpoint pool: {self._endpoint_pool.size} серверов, "
+                            f"Endpoint pool: {self._endpoint_pool.size} servers, "
                             f"api_workers={self.api_workers}. "
-                            f"Запросы распределяются round-robin."
+                            f"Requests are distributed round-robin."
                         ),
                     }
                 )
@@ -399,8 +399,8 @@ class SortWorker:
                     {
                         "type": "log",
                         "text": (
-                            f"Файловых потоков: {self.workers}; одновременных запросов к LM: {self.api_workers}. "
-                            "Это безопаснее для LM Studio, который часто нестабилен при параллельных vision-запросах."
+                            f"File workers: {self.workers}; concurrent LM requests: {self.api_workers}. "
+                            "This is safer for LM Studio, which is often unstable with concurrent vision requests."
                         ),
                     }
                 )
@@ -919,8 +919,8 @@ class SortWorker:
                             {
                                 "type": "log",
                                 "text": (
-                                    f"Мало места на диске: {path.name} не скопирован. "
-                                    "Файл оставлен pending и будет повторён в следующем запуске."
+                                    f"Insufficient disk space: {path.name} was not copied. "
+                                    "File remains pending and will be retried on the next run."
                                 ),
                             }
                         )
@@ -950,7 +950,7 @@ class SortWorker:
                             "type": "log",
                             "text": (
                                 f"copy error {path}: {e!s}. "
-                                "Файл оставлен pending и будет повторён в следующем запуске."
+                                "File remains pending and will be retried on the next run."
                             ),
                         }
                     )
