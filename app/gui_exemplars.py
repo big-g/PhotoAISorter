@@ -38,25 +38,25 @@ class ExemplarsDialog(ctk.CTkToplevel):
     def _build(self) -> None:
         top = ctk.CTkFrame(self, fg_color="transparent")
         top.pack(fill="x", padx=12, pady=(12, 6))
-        ctk.CTkLabel(top, text="Тег:", width=40).pack(side="left")
+        ctk.CTkLabel(top, text="Tag:", width=40).pack(side="left")
         self._tag_combo = ctk.CTkComboBox(
             top,
-            values=["(нет тегов)"],
+            values=["(no tags)"],
             variable=self._tag_var,
             width=220,
             state="readonly",
             command=lambda _v: self._refresh_file_list(),
         )
         self._tag_combo.pack(side="left", padx=(4, 8))
-        ctk.CTkButton(top, text="Открыть папку", width=120, command=self._open_tag_folder).pack(
+        ctk.CTkButton(top, text="Open folder", width=120, command=self._open_tag_folder).pack(
             side="left"
         )
 
         self._hint = ctk.CTkLabel(
             self,
             text=(
-                "Эталоны — примеры фото для каждого тега (5–20 шт.). "
-                "Перетащите файлы в зону ниже или нажмите «Добавить фото…»."
+                "Exemplars are sample photos for each tag (5–20). "
+                "Drag files into the area below or click “Add photos…”."
             ),
             wraplength=600,
             justify="left",
@@ -70,19 +70,19 @@ class ExemplarsDialog(ctk.CTkToplevel):
         self._drop_frame.pack_propagate(False)
         self._drop_label = ctk.CTkLabel(
             self._drop_frame,
-            text="Перетащите сюда JPEG / PNG / WEBP\n(Windows) или используйте кнопку ниже",
+            text="Drag JPEG / PNG / WEBP files here\n(Windows) or use the button below",
             justify="center",
         )
         self._drop_label.pack(expand=True)
 
         btn_row = ctk.CTkFrame(self, fg_color="transparent")
         btn_row.pack(fill="x", padx=12, pady=(0, 6))
-        ctk.CTkButton(btn_row, text="Добавить фото…", command=self._add_files_dialog).pack(
+        ctk.CTkButton(btn_row, text="Add photos…", command=self._add_files_dialog).pack(
             side="left", padx=(0, 8)
         )
         ctk.CTkButton(
             btn_row,
-            text="Удалить выбранные",
+            text="Delete selected",
             fg_color=("gray75", "gray35"),
             command=self._remove_selected,
         ).pack(side="left", padx=(0, 8))
@@ -101,10 +101,10 @@ class ExemplarsDialog(ctk.CTkToplevel):
         tags = [t for t in build_custom_categories(active) if t != "uncategorized"] if active else []
         root = ensure_refs_layout(extra_tags=tags)
         if self._on_log:
-            self._on_log(f"Эталоны хранятся в {root} (папка data/ проекта, не в git)")
+            self._on_log(f"Exemplars are stored in {root} (project data folder, not in git)")
         if not tags:
-            self._tag_combo.configure(values=["(нет тегов)"])
-            self._tag_var.set("(нет тегов)")
+            self._tag_combo.configure(values=["(no tags)"])
+            self._tag_var.set("(no tags)")
             return
         self._tag_combo.configure(values=tags)
         if self._tag_var.get() not in tags:
@@ -132,7 +132,7 @@ class ExemplarsDialog(ctk.CTkToplevel):
             row = ctk.CTkFrame(self._list, fg_color="transparent")
             row.pack(fill="x", pady=1)
             ctk.CTkCheckBox(row, text=p.name, variable=var).pack(side="left", anchor="w")
-        self._count_label.configure(text=f"{len(paths)} / 48 файлов")
+        self._count_label.configure(text=f"{len(paths)} / 48 files")
 
     def _setup_drag_drop(self) -> None:
         if sys.platform != "win32":
@@ -146,7 +146,7 @@ class ExemplarsDialog(ctk.CTkToplevel):
                 func=lambda files: self.after(0, lambda: self._on_drop_files(files)),
             )
             self._drop_label.configure(
-                text="Перетащите сюда JPEG / PNG / WEBP\n(отпустите для добавления в выбранный тег)"
+                text="Drag JPEG / PNG / WEBP files here\n(drop to add them to the selected tag)"
             )
         except Exception:
             pass
@@ -169,10 +169,10 @@ class ExemplarsDialog(ctk.CTkToplevel):
             return
         paths = filedialog.askopenfilenames(
             parent=self,
-            title=f"Эталоны для «{tag}»",
+            title=f"Exemplars for “{tag}”",
             filetypes=[
-                ("Изображения", "*.jpg *.jpeg *.png *.webp *.bmp *.gif"),
-                ("Все файлы", "*.*"),
+                ("Images", "*.jpg *.jpeg *.png *.webp *.bmp *.gif"),
+                ("All files", "*.*"),
             ],
         )
         if paths:
@@ -189,7 +189,7 @@ class ExemplarsDialog(ctk.CTkToplevel):
         if n:
             clear_classifier_cache()
             if self._on_log:
-                self._on_log(f"Эталоны «{tag}»: добавлено {n} фото")
+                self._on_log(f"Exemplars “{tag}”: added {n} photos")
         self._refresh_file_list()
 
     def _remove_selected(self) -> None:
@@ -204,7 +204,7 @@ class ExemplarsDialog(ctk.CTkToplevel):
         if removed:
             clear_classifier_cache()
             if self._on_log:
-                self._on_log(f"Эталоны «{tag}»: удалено {removed}")
+                self._on_log(f"Exemplars “{tag}”: removed {removed}")
         self._refresh_file_list()
 
     def _open_tag_folder(self) -> None:
@@ -222,4 +222,4 @@ class ExemplarsDialog(ctk.CTkToplevel):
                 subprocess.run(["xdg-open", str(folder)], check=False)
         except OSError as e:
             if self._on_log:
-                self._on_log(f"Не удалось открыть папку: {e}")
+                self._on_log(f"Could not open folder: {e}")
