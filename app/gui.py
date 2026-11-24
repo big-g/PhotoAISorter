@@ -64,10 +64,10 @@ def _format_eta(seconds: float) -> str:
     m, s = divmod(sec, 60)
     h, m = divmod(m, 60)
     if h > 0:
-        return f"~{h} ч {m} мин"
+        return f"~{h} h {m} min"
     if m > 0:
-        return f"~{m} мин {s} с"
-    return f"~{s} с"
+        return f"~{m} min {s} s"
+    return f"~{s} s"
 
 
 def _section_label(parent: ctk.CTkFrame, text: str) -> None:
@@ -111,9 +111,9 @@ def _path_is_relative_to(path: Path, parent: Path) -> bool:
 
 
 _MEDIA_MODE_LABELS = {
-    MediaScanMode.PHOTOS_ONLY.value: "Фото",
-    MediaScanMode.PHOTOS_AND_VIDEO.value: "Фото + видео",
-    MediaScanMode.VIDEO_ONLY.value: "Видео + GIF",
+    MediaScanMode.PHOTOS_ONLY.value: "Photos",
+    MediaScanMode.PHOTOS_AND_VIDEO.value: "Photos + videos",
+    MediaScanMode.VIDEO_ONLY.value: "Videos + GIFs",
 }
 _MEDIA_MODE_VALUES = {v: k for k, v in _MEDIA_MODE_LABELS.items()}
 
@@ -268,12 +268,12 @@ class App(ctk.CTk):
         migrate_legacy_project_root()
         self._build()
         self._restore_model_combo_selection()
-        self._append_log(f"Кеш приложения: {project_tmp_dir()} (держите проект на SSD)")
+        self._append_log(f"Application cache: {project_tmp_dir()} (keep the project on an SSD)")
         if self._interrupted_sort_sessions:
-            self._append_log(f"Найдено прерванных сессий сортировки: {self._interrupted_sort_sessions}.")
+            self._append_log(f"Interrupted sorting sessions found: {self._interrupted_sort_sessions}.")
         if self._cache_clear_on_start:
             self._cache_service.clear_all()
-            self._append_log("Кеш очищен при запуске (по настройке).")
+            self._append_log("Cache cleared at startup (per setting).")
         self._refresh_context_display()
         self._in_var.trace_add("write", lambda *_: self._update_start_state())
         self._out_var.trace_add("write", lambda *_: self._update_start_state())
@@ -311,7 +311,7 @@ class App(ctk.CTk):
             self._model_var.set(loaded)
             self._model_manual_var.set("")
             self._append_log(
-                f"LM Studio: вместо «{model}» используется загруженная модель «{loaded}»."
+                f"LM Studio: loaded model “{loaded}” is being used instead of “{model}”."
             )
             return canonical_model_id(api_base, loaded, api_key=api_key), ""
         return None, err
@@ -1009,7 +1009,7 @@ class App(ctk.CTk):
         # If user explicitly picks model from dropdown, do not keep stale manual override.
         if self._model_manual_var.get().strip():
             self._model_manual_var.set("")
-            self._append_log("Ручная модель очищена: используется выбранная из списка.")
+            self._append_log("Manual model override cleared; using the model selected from the list.")
 
     def _set_probe_busy(self, busy: bool) -> None:
         self._probe_busy = busy
@@ -1090,15 +1090,15 @@ class App(ctk.CTk):
         if ff:
             short = ff if len(ff) < 72 else "..." + ff[-68:]
             self._ffmpeg_hint.configure(
-                text=f"ffmpeg: найден ({short}).",
+                text=f"ffmpeg: found ({short}).",
                 text_color=("gray30", "gray65"),
             )
         else:
             self._ffmpeg_hint.configure(
                 text=(
-                    "ffmpeg не найден — это не ошибка запуска. Видео пробует OpenCV; "
-                    "для надёжности: установите ffmpeg, добавьте в PATH или задайте "
-                    "PHOTO_AI_SORTER_FFMPEG=путь\\к\\ffmpeg.exe"
+                    "ffmpeg not found — this is not a startup error. Video processing will try OpenCV; "
+                    "for reliability, install ffmpeg, add it to PATH, or set "
+                    "PHOTO_AI_SORTER_FFMPEG=path\\to\\ffmpeg.exe"
                 ),
                 text_color=("goldenrod", "#c9a227"),
             )
@@ -1225,7 +1225,7 @@ class App(ctk.CTk):
         total = int(row["total_files"] or 0)
         status = str(row["status"] or "unknown")
         src = str(row["source_dir"] or "")
-        return f"{done}/{total} файлов, статус {status}\n{src}"
+        return f"{done}/{total} files, status {status}\n{src}"
 
     def _apply_sort_session_to_fields(self, row) -> None:
         self._in_var.set(str(row["source_dir"] or ""))
@@ -1263,11 +1263,11 @@ class App(ctk.CTk):
     def _on_resume_last_sort(self) -> None:
         row = self._latest_sort_session()
         if row is None:
-            self._append_log("Нет сохранённых сессий сортировки для продолжения.")
+            self._append_log("No saved sorting sessions available to resume.")
             self._refresh_resume_sort_button()
             return
         self._apply_sort_session_to_fields(row)
-        self._append_log(f"Продолжение сессии сортировки: {self._sort_session_summary(row)}")
+        self._append_log(f"Resuming sorting session: {self._sort_session_summary(row)}")
         self._on_start(force_resume=True)
 
     def _apply_model_profile(self) -> None:
@@ -1335,9 +1335,9 @@ class App(ctk.CTk):
                 active = self._active_model_profile_var.get().strip()
                 for name in sorted(self._model_profiles):
                     p = self._model_profiles[name]
-                    marker = "  ◀ активный" if name == active else ""
+                    marker = "  ◀ active" if name == active else ""
                     tb.insert("end", f"[{name}]{marker}\n")
-                    tb.insert("end", f"  Модель:      {p.model or DEFAULT_MODEL}\n")
+                    tb.insert("end", f"  Model:      {p.model or DEFAULT_MODEL}\n")
                     tb.insert("end", f"  API base:    {p.api_base or DEFAULT_API_BASE}\n")
                     tb.insert(
                         "end",
@@ -1346,7 +1346,7 @@ class App(ctk.CTk):
                     )
                     if p.prompt_extra:
                         short = p.prompt_extra[:80] + ("..." if len(p.prompt_extra) > 80 else "")
-                        tb.insert("end", f"  Промпт:      {short}\n")
+                        tb.insert("end", f"  Prompt:      {short}\n")
                     tb.insert("end", "\n")
             tb.configure(state="disabled")
 
@@ -1413,7 +1413,7 @@ class App(ctk.CTk):
             try:
                 models = list_models(base, api_key=self._api_key_resolved())
             except Exception as exc:
-                self._post(lambda err=exc: self._append_log(f"Список моделей: ошибка {err!s}"))
+                self._post(lambda err=exc: self._append_log(f"Model list: error {err!s}"))
                 self._post(lambda: self._set_probe_busy(False))
                 return
 
@@ -1444,19 +1444,19 @@ class App(ctk.CTk):
                     self._saved_model_selected = pick
                     self._model_manual_var.set("")
                 else:
-                    self._model_combo.configure(values=["— сервер вернул пустой список —"])
+                    self._model_combo.configure(values=["— server returned an empty list —"])
                     self._model_var.set(self._model_combo.cget("values")[0])
                 self._vision_status.configure(text=t("lm.vision.unknown"), text_color=("gray30", "gray70"))
                 loaded_note = ""
                 if loaded_key and models and self._model_var.get().strip() == loaded_key:
-                    loaded_note = f", загружена в LM Studio: {loaded_key}"
-                self._append_log(f"Загружено моделей: {len(models)}{loaded_note}")
+                    loaded_note = f", loaded in LM Studio: {loaded_key}"
+                self._append_log(f"Models loaded: {len(models)}{loaded_note}")
                 self._set_probe_busy(False)
 
             self._post(apply)
 
         threading.Thread(target=work, daemon=True).start()
-        self._append_log("Запрос списка моделей...")
+        self._append_log("Requesting model list...")
 
     def _on_self_test(self) -> None:
         base = self._api_var.get().strip() or DEFAULT_API_BASE
@@ -1467,9 +1467,9 @@ class App(ctk.CTk):
             ok, report = full_api_self_test(base, model, api_key=self._api_key_resolved())
 
             def apply() -> None:
-                self._append_log("——— Самотест ———")
+                self._append_log("——— Self-test ———")
                 self._append_log(report)
-                self._append_log("——— конец ———")
+                self._append_log("——— end ———")
                 if ok:
                     self._vision_status.configure(
                         text=t("lm.vision.selftest_ok"),
@@ -1485,12 +1485,12 @@ class App(ctk.CTk):
             self._post(apply)
 
         threading.Thread(target=work, daemon=True).start()
-        self._append_log("Запуск самотеста API...")
+        self._append_log("Starting API self-test...")
 
     def _format_loaded_models(self, rows: list[dict[str, object]]) -> str:
         if not rows:
-            return "LM Studio: загруженных моделей не найдено."
-        parts: list[str] = [f"LM Studio: загружено инстансов: {len(rows)}"]
+            return "LM Studio: no loaded models found."
+        parts: list[str] = [f"LM Studio: loaded instances: {len(rows)}"]
         by_key: dict[str, list[dict[str, object]]] = {}
         for row in rows:
             by_key.setdefault(str(row.get("model_key") or ""), []).append(row)
@@ -1516,9 +1516,9 @@ class App(ctk.CTk):
         if active and text:
             self._context.insert("1.0", f"[{active.name}]\n{text}")
         elif active:
-            self._context.insert("1.0", f"[{active.name}] — тегов: {len(active.tags)} (без описаний)")
+            self._context.insert("1.0", f"[{active.name}] — {len(active.tags)} tags (no descriptions)")
         else:
-            self._context.insert("1.0", "(нет активного набора — откройте «Теги...»)")
+            self._context.insert("1.0", "(no active set — open “Tags...”)")
         self._context.configure(state="disabled")
 
     def _open_context_tags(self) -> None:
@@ -1539,31 +1539,31 @@ class App(ctk.CTk):
                 rows = loaded_model_instances(base, api_key=self._api_key_resolved())
                 text = self._format_loaded_models(rows)
             except Exception as e:
-                text = f"LM Studio loaded models: ошибка {e!s}"
+                text = f"LM Studio loaded models: error {e!s}"
             self._post(lambda: self._append_log(text))
             self._post(lambda: self._set_probe_busy(False))
 
         threading.Thread(target=work, daemon=True).start()
-        self._append_log("Проверяю загруженные модели LM Studio...")
+        self._append_log("Checking loaded LM Studio models...")
 
     def _on_start(self, *, force_resume: bool = False) -> None:
         in_path = Path(self._in_var.get().strip())
         out_path = Path(self._out_var.get().strip())
         if not in_path.is_dir():
-            self._append_log("Ошибка: укажите существующую папку для сканирования.")
+            self._append_log("Error: specify an existing folder to scan.")
             return
         if in_path.resolve() == out_path.resolve():
-            self._append_log("Ошибка: папка результата не должна совпадать с папкой сканирования.")
+            self._append_log("Error: the output folder must not be the same as the scan folder.")
             return
         if not out_path.exists():
             try:
                 out_path.mkdir(parents=True, exist_ok=True)
             except OSError as e:
-                self._append_log(f"Ошибка папки назначения: {e}")
+                self._append_log(f"Output folder error: {e}")
                 return
         if _path_is_relative_to(out_path, in_path):
             self._append_log(
-                "Внимание: папка результата находится внутри источника; уже лежащие там файлы будут исключены из скана."
+                "Warning: the output folder is inside the source; files already there will be excluded from the scan."
             )
 
         _tag_store = load_tag_store()
@@ -1586,7 +1586,7 @@ class App(ctk.CTk):
             blockers = hybrid_start_blockers(categories_count=len(tag_cfg.categories))
             if blockers:
                 for msg in blockers:
-                    self._append_log(f"Ошибка: {msg}")
+                    self._append_log(f"Error: {msg}")
                 return
             from app.fast_classify.clip_setup import ensure_clip_ready
 
@@ -1594,8 +1594,8 @@ class App(ctk.CTk):
             ok, status = ensure_clip_ready(fc_settings, on_log=self._append_log)
             if not ok:
                 self._append_log(
-                    "Сортировка отменена: подготовьте CLIP кнопкой «Скачать веса CLIP» "
-                    "или проверьте интернет."
+                    "Sorting cancelled: prepare CLIP using the “Download CLIP weights” button "
+                    "or check your internet connection."
                 )
                 return
             self._append_log(status)
@@ -1604,14 +1604,14 @@ class App(ctk.CTk):
         if self._sort_uses_lm_studio(tag_mode):
             resolved, lm_err = self._resolve_lm_model_for_sort(api_base)
             if lm_err:
-                self._append_log(f"Ошибка LM Studio: {lm_err}")
+                self._append_log(f"LM Studio error: {lm_err}")
                 self._append_log(
-                    "Подсказка: в LM Studio загрузите vision-модель, нажмите «Обновить список моделей», "
-                    "выберите её в списке и при необходимости «Самотест API»."
+                    "Tip: load a vision model in LM Studio, click “Refresh model list”, "
+                    "select it in the list, and if needed run “API self-test”."
                 )
                 return
             model = resolved or model
-            self._append_log(f"LM Studio: модель «{model}»")
+            self._append_log(f"LM Studio: model “{model}”")
 
         user_context = tag_cfg.user_context
         session_key = self._sort_session_key_for_current(in_path, out_path, media_mode, tag_mode_str)
@@ -1632,23 +1632,23 @@ class App(ctk.CTk):
         self._prog_label.configure(text="0 / …")
         self._eta_label.configure(text=t("eta.estimate_after_first"))
         mode_labels = {
-            MediaScanMode.PHOTOS_ONLY: "только фото",
-            MediaScanMode.PHOTOS_AND_VIDEO: "фото + видео",
-            MediaScanMode.VIDEO_ONLY: "только видео",
+            MediaScanMode.PHOTOS_ONLY: "photos only",
+            MediaScanMode.PHOTOS_AND_VIDEO: "photos + videos",
+            MediaScanMode.VIDEO_ONLY: "videos only",
         }
-        self._append_log(f"--- Старт (режим: {mode_labels.get(media_mode, media_mode.value)}) ---")
+        self._append_log(f"--- Start (mode: {mode_labels.get(media_mode, media_mode.value)}) ---")
         if resume_session:
-            self._append_log("Сессия: продолжение сохранённого прогресса.")
+            self._append_log("Session: resuming saved progress.")
         else:
-            self._append_log("Сессия: новая или без найденного незавершённого прогресса.")
+            self._append_log("Session: new or no unfinished progress found.")
         if tag_mode == TagMode.PRESET:
             self._append_log(t("sort.log_mode_preset", profile=search_profile.value))
         elif tag_mode == TagMode.AUTO:
             self._append_log(t("sort.log_mode_auto"))
         elif tag_mode == TagMode.CUSTOM:
-            self._append_log("Режим папок: пользовательский список категорий.")
+            self._append_log("Folder mode: custom category list.")
         elif tag_mode == TagMode.HYBRID:
-            self._append_log("Режим папок: быстрая CLIP + VLM для сомнительных файлов.")
+            self._append_log("Folder mode: fast CLIP + VLM for uncertain files.")
         else:
             self._append_log(t("sort.log_mode_free"))
             self._append_log(t("sort.warn_large_library_free"))
@@ -1658,7 +1658,7 @@ class App(ctk.CTk):
         workers = self._profile_workers_parsed()
         api_workers = self._profile_api_workers_parsed()
         self._append_log(
-            f"Параллелизм: файловых потоков {workers}, одновременных запросов к LM {api_workers}."
+            f"Concurrency: {workers} file workers, {api_workers} simultaneous LM requests."
         )
         aliases = load_category_aliases()
 
@@ -1714,7 +1714,7 @@ class App(ctk.CTk):
             for worker in workers:
                 worker.request_stop()
             self._append_log(
-                f"Стоп запрошен для {len(workers)} sort worker(s): прогресс сохранится после текущего файла/запроса..."
+                f"Stop requested for {len(workers)} sort worker(s): progress will be saved after the current file/request..."
             )
 
     def _poll_queue(self) -> None:
@@ -1763,7 +1763,7 @@ class App(ctk.CTk):
                 self._append_log(t("sort.warn_many_files_free", n=self._total_files))
         elif msg_type == "current":
             p = msg.get("path", "")
-            self._append_log(f"{prefix}Файл: {p}")
+            self._append_log(f"{prefix}File: {p}")
         elif msg_type == "log":
             text = prefix + str(msg.get("text", ""))
             low = text.lower()
@@ -1803,7 +1803,7 @@ class App(ctk.CTk):
             if self._channel_err_streak > 0:
                 self._flush_channel_error_summary()
             reason = msg.get("reason", "")
-            self._append_log(f"{prefix}--- Готово ({reason}) ---")
+            self._append_log(f"{prefix}--- Done ({reason}) ---")
             if run_id:
                 self._workers.pop(str(run_id), None)
             remaining = [w for w in self._workers.values() if w.is_alive()]
@@ -1823,7 +1823,7 @@ class App(ctk.CTk):
             done = int(msg.get("done", 0) or 0)
             total = int(msg.get("total", 0) or 0)
             if status and status != "running":
-                self._append_log(f"{prefix}Сессия сортировки сохранена: {status}, {done}/{total}.")
+                self._append_log(f"{prefix}Sorting session saved: {status}, {done}/{total}.")
         elif msg_type == "state_changed":
             state = str(msg.get("state", ""))
             if state == TaskState.PAUSED.value:
