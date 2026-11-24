@@ -16,13 +16,13 @@ from app.tag_mode_ui import CLIP_QUALITY_LABELS
 def describe_clip_settings(settings: FastClassifySettings) -> str:
     q = CLIP_QUALITY_LABELS.get(settings.quality, settings.quality)
     crop = (
-        f", {settings.multi_crop_views} кропов"
+        f", {settings.multi_crop_views} crops"
         if settings.multi_crop and settings.multi_crop_views > 1
         else ""
     )
     return (
-        f"Профиль «{q}»: {settings.model_name}, {settings.image_max_side}px{crop}, "
-        f"батч {settings.batch_size}."
+        f"Profile “{q}”: {settings.model_name}, {settings.image_max_side}px{crop}, "
+        f"batch {settings.batch_size}."
     )
 
 
@@ -77,18 +77,18 @@ def ensure_clip_ready(
     s = settings or load_fast_classify_settings()
     if on_log:
         on_log(
-            f"CLIP: подготовка {s.model_name} ({s.pretrained}), "
-            f"кэш весов: {clip_cache_dir()}"
+            f"CLIP: preparing {s.model_name} ({s.pretrained}), "
+            f"weights cache: {clip_cache_dir()}"
         )
     try:
         path, _ = ensure_clip_weights_file(s, on_log=on_log)
     except Exception as e:
-        err = f"CLIP: не удалось загрузить веса — {e}"
+        err = f"CLIP: failed to load weights — {e}"
         if on_log:
             on_log(err)
         return False, err
 
-    line = f"{describe_clip_settings(s)} Файл: {path.name}."
+    line = f"{describe_clip_settings(s)} File: {path.name}."
     if on_log:
         on_log(f"CLIP: готово. {line}")
     return True, line
