@@ -117,10 +117,10 @@ TEXTS: dict[str, str] = {
     "exemplars.window_title": "Exemplars for fast CLIP",
     "sort.resume.title": "Saved progress found",
     "sort.resume.text": (
-        "Для этих параметров сортировки уже есть сессия:\n\n"
+        "A session already exists for these sorting settings:\n\n"
         "{summary}\n\n"
-        "Да — продолжить\n"
-        "Нет — начать новую сессию (общий SHA-кеш всё равно сохранится)\n"
+        "Yes — resume\n"
+        "No — start a new session (the shared SHA cache will still be retained)\n"
         "Cancel — do not start"
     ),
     "cache.choose": "Choose what to clear:",
@@ -144,7 +144,7 @@ TEXTS: dict[str, str] = {
     "cache.warn_stop_first": "Stop sorting before clearing the cache.",
     "cache.warn_probe_wait": "Wait for the API check to finish.",
     "cache.ask.title": "Clear cache",
-    "cache.ask.text": "Что очистить?\n\nДа — кеш сортировки\nНет — кеш дубликатов\nОтмена — ничего не менять",
+    "cache.ask.text": "What should be cleared?\n\nYes — sorting cache\nNo — duplicate cache\nCancel — leave unchanged",
     "cache.log.cleared_sort": "Sorting cache cleared (entries: {count}).",
     "cache.log.cleared_dup": "Duplicate cache cleared (signatures: {count}).",
     "cache.log.cleared_both": "Both caches cleared (sorting: {sort_count}, duplicates: {dup_count}).",
@@ -266,7 +266,7 @@ TEXTS: dict[str, str] = {
     "dup.delete.cancelled_partial": "Deleted {k} of {total} files. Operation interrupted.",
     "dup.delete.cancelled_none": "Deletion cancelled.",
     "dup.delete.confirm.title": "Confirm deletion",
-    "dup.delete.only_reviewed_note": "\n(Режим: только группы с отметкой «Просмотрено».)",
+    "dup.delete.only_reviewed_note": "\n(Mode: only groups marked “Reviewed”.)",
     "dup.journal.empty": "Deletion log is empty.",
     "dup.journal.title": "Deletion log",
     "dup.profile.saved": "Profile saved: {name}",
