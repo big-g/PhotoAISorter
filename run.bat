@@ -42,7 +42,7 @@ if "%HAVE_PY%"=="0" (
 )
 if "%HAVE_PY%"=="0" (
     echo [ERROR] Python not found. Python 3.10+ must be in PATH or available through the `py` launcher.
-    echo Download: https://www.python.org/downloads/ ^(отметьте «Add python.exe to PATH»^).
+    echo Download: https://www.python.org/downloads/ ^(check “Add python.exe to PATH”^).
     goto :fail
 )
 
@@ -129,13 +129,13 @@ if /i "%~1"=="test" (
 echo [3/3] Checking environment ...
 "%PY%" -c "import sys; sys.exit(0 if sys.version_info>=(3,10) else 1)"
 if errorlevel 1 (
-    echo [ERROR] Нужен Python 3.10+. В .venv сейчас другая версия — удалите папку .venv и запустите скрипт снова.
+    echo [ERROR] Python 3.10+ is required. The current .venv uses another version — delete the .venv folder and rerun the script.
     goto :fail
 )
 
 "%PY%" -m compileall -q app main.py
 if errorlevel 1 (
-    echo [ERROR] Python compilation error ^(синтаксис^).
+    echo [ERROR] Python compilation error ^(syntax^).
     goto :fail
 )
 "%PY%" -c "import app.gui; import app.gui_duplicates; import app.duplicate_finder; import app.duplicate_worker; import app.signature_db; import app.worker; import app.lm_studio; import app.settings_store; import app.video_frames; print('Import check: OK')"
@@ -151,7 +151,7 @@ if errorlevel 1 (
         set "VENV_RECREATE_DONE=1"
         goto :create_venv
     )
-    echo [ERROR] Failed to import application ^(см. сообщение выше^).
+    echo [ERROR] Failed to import application ^(see message above^).
     echo Try manually: "%PY%" -m pip install -r requirements.txt -v
     goto :fail
 )
