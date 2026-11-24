@@ -64,7 +64,7 @@ The launcher will:
 4. Create a **Photo AI Sorter** desktop shortcut on first run (Windows)  
 5. Start the GUI  
 
-**First launch** can take several minutes (pip). **First hybrid CLIP sort** may download ~900 MB (`ViT-L-14` weights) into `data/clip_weights/` — use the **«Скачать веса CLIP»** button in the GUI or start a sort (download runs automatically).
+**First launch** can take several minutes (pip). **First hybrid CLIP sort** may download ~900 MB (`ViT-L-14` weights) into `data/clip_weights/` — use the **“Download CLIP weights”** button in the GUI or start a sort (download runs automatically).
 
 Optional:
 
@@ -79,13 +79,13 @@ Run tests: `run.bat test` (Windows) or `./run.sh test` (Linux).
 
 ### Hybrid CLIP in the GUI
 
-1. Tag mode → **Быстрая CLIP**  
-2. Panel **«Локальный CLIP»**:  
-   - **Точность:** Быстро / Баланс / Макс / **Ультра** (default, best accuracy)  
-   - **CLIP:** Авто / GPU / CPU  
+1. Tag mode → **Fast CLIP**  
+2. Panel **“Local CLIP”**:  
+   - **Accuracy:** Fast / Balanced / Max / **Ultra** (default, best accuracy)  
+   - **CLIP:** Auto / GPU / CPU  
    - **VLM fallback** — LM Studio for uncertain files  
-   - **Скачать веса CLIP** — download/check model weights before sorting  
-3. Configure tags (**Теги…**) and exemplars (**Эталоны…** → `data/refs/<tag>/`)
+   - **Download CLIP weights** — download/check model weights before sorting  
+3. Configure tags (**Tags…**) and exemplars (**Exemplars…** → `data/refs/<tag>/`)
 
 The app does not require a committed API key. For servers that enforce bearer auth, set:
 
@@ -215,7 +215,7 @@ Each line includes the source path, SHA-256, category, candidates, confidence, s
 
 Sorting progress is saved into the local SQLite app data database. If a run is
 stopped or the PC shuts down, reopen the app and start the same input/output/mode
-again and choose `Да` when prompted.
+again and choose `Yes` when prompted.
 
 The resume path stores per-file path, size, mtime, SHA-256, category, and session
 status locally. API keys are not written into session records.
