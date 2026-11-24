@@ -1706,7 +1706,7 @@ class App(ctk.CTk):
         for worker in workers:
             worker.set_paused(paused)
         self._btn_pause.configure(text=t("buttons.resume") if paused else t("buttons.pause"))
-        self._append_log(("Пауза" if paused else "Продолжение") + f": {len(workers)} sort worker(s)")
+        self._append_log(("Paused" if paused else "Resumed") + f": {len(workers)} sort worker(s)")
 
     def _on_stop(self) -> None:
         workers = [w for w in self._workers.values() if w.is_alive()]
