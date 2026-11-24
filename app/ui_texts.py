@@ -18,34 +18,34 @@ TEXTS: dict[str, str] = {
     "folders.tag_mode.section": "Tag mode",
     "folders.tag_mode.show_list": "Folder list…",
     "folders.tag_mode.hint_preset": (
-        "Фиксированный список папок по выбранному профилю (SFW / NSFW / Furry). "
-        "Подходит для больших коллекций: предсказуемая структура каталога."
+        "Fixed folder list for the selected profile (SFW / NSFW / Furry). "
+        "Suitable for large collections: predictable folder structure."
     ),
     "folders.tag_mode.hint_free": (
-        "Модель задаёт папки сама (в т.ч. a/b/c). Совпадение с пресетом только если тег передан одной строкой без «угадывания» по тексту. "
-        "На очень больших библиотеках возможны тысячи папок — имеет смысл пробовать на подвыборке."
+        "The model chooses folders itself (including a/b/c). Preset matching occurs only when a tag is supplied as a single string, without guessing from text. "
+        "Very large libraries may produce thousands of folders; test on a subset first."
     ),
     "folders.tag_mode.hint_auto": (
-        "Автокатегории: модель может предложить новые стабильные папки; "
-        "новые ветки проходят через стабилизатор (синонимы, ограничение глубины)."
+        "Auto categories: the model may suggest new stable folders; "
+        "new branches pass through a stabilizer (synonyms and depth limits)."
     ),
     "folders.tag_mode.hint_custom": (
-        "Свой список: модель использует только ваши теги из пользовательского списка. "
-        "Настройте список в «Теги...» → вкладка «Списки категорий»."
+        "Custom list: the model uses only tags from your user-defined list. "
+        "Configure the list in “Tags...” → “Category lists” tab."
     ),
     "folders.tag_mode.hint_hybrid": (
-        "Быстрая CLIP: локальная сортировка батчами (тысячи фото/час на GPU). "
-        "Теги — из активного пользовательского набора. Эталоны — кнопка «Эталоны…». "
-        "Сомнительные файлы при необходимости уходят в LM Studio (VLM fallback). "
-        "Точность: заполните описания тегов и добавьте 10+ эталонов на важные категории "
-        "(см. docs/ACCURACY_RU.md)."
+        "Fast CLIP: local batch sorting (thousands of photos per hour on a GPU). "
+        "Tags come from the active user set. Exemplars: use the “Exemplars…” button. "
+        "Uncertain files can optionally be sent to LM Studio (VLM fallback). "
+        "Accuracy: fill in tag descriptions and add 10+ exemplars for important categories "
+        "(see docs/ACCURACY_RU.md)."
     ),
     "folders.tag_mode.hybrid_clip_ok": "CLIP: dependencies installed; ready for local sorting.",
     "folders.tag_mode.hybrid_clip_missing": (
-        "CLIP: не установлен — pip install torch open-clip-torch (режим запуска недоступен)."
+        "CLIP: not installed — pip install torch open-clip-torch (mode unavailable)."
     ),
     "folders.tag_mode.hybrid_error_no_tags": (
-        "Нет активного набора тегов. Откройте «Теги…» и выберите или создайте набор."
+        "No active tag set. Open “Tags…” and select or create a set."
     ),
     "folders.tag_mode.refs": "Exemplars…",
     "folders.tag_mode.hybrid_vlm_fallback": "VLM fallback (LM Studio for uncertain items)",
@@ -62,14 +62,14 @@ TEXTS: dict[str, str] = {
     "sort.log_mode_auto": "Folder mode: Auto categories (model suggests new stable folders).",
     "sort.log_mode_free": "Folder mode: free tags (model may create new folders).",
     "sort.review_first": "Report only",
-    "sort.review_first.hint": "Проверочный запуск без копирования: категории попадут в manifest в папке результата.",
+    "sort.review_first.hint": "Dry run without copying: categories will be recorded in the manifest in the output folder.",
     "sort.warn_large_library_free": (
-        "Подсказка: при 50k+ файлов свободный режим может раздувать число папок; "
-        "кеш по хешу ускоряет повторный прогон, но первый проход всё равно вызывает API по каждому новому файлу."
+        "Tip: with 50k+ files, free mode can create excessive folders; "
+        "hash caching speeds up subsequent runs, but the first pass still calls the API for every new file."
     ),
     "sort.warn_many_files_free": (
-        "Внимание: в папке найдено {n} файлов при свободном режиме тегов — возможны тысячи уникальных подпапок. "
-        "Рассмотрите фиксированный список или разбивку по подпапкам."
+        "Warning: {n} files found with free tag mode; this may create thousands of unique subfolders. "
+        "Consider a fixed list or processing subfolders separately."
     ),
     "buttons.close": "Close",
     "buttons.apply": "Apply",
