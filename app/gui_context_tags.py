@@ -65,7 +65,7 @@ class TagSetsDialog(ctk.CTkToplevel):
             text=(
                 "Each tag is a sorting folder. The optional description helps the model "
                 "know what to look for in the image. If blank, the model receives only the tag name.\n"
-                "Active набор используется в режиме «Свой список»."
+                "The active set is used in “Custom list” mode."
             ),
             wraplength=680,
             justify="left",
@@ -206,4 +206,4 @@ class TagSetsDialog(ctk.CTkToplevel):
         save_tag_store(self._store)
         if self._on_save_callback:
             self._on_save_callback()
-        messagebox.showinfo("Saved", "Tag Sets сохранены.")
+        messagebox.showinfo("Saved", "Tag sets saved.")
