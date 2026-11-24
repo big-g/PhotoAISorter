@@ -668,7 +668,7 @@ class DuplicatesPane(ctk.CTkFrame):
         try:
             workers = max(1, min(max_duplicate_workers(), int(self._workers_var.get().strip())))
         except ValueError:
-            messagebox.showerror("Параметры", f"Workers must be a number from 1 to {max_duplicate_workers()}")
+            messagebox.showerror("Settings", f"Workers must be a number from 1 to {max_duplicate_workers()}")
             return None
         base.parallel_workers = workers
         base.keep_policy = self._keep_var.get()  # type: ignore[assignment]
@@ -865,7 +865,7 @@ class DuplicatesPane(ctk.CTkFrame):
             return
         root = Path(self._dir_var.get().strip())
         if not root.is_dir():
-            messagebox.showwarning("Папка", "Specify an existing folder.")
+            messagebox.showwarning("Folder", "Specify an existing folder.")
             return
         opts = self._parse_options()
         if opts is None:
@@ -1267,7 +1267,7 @@ class DuplicatesPane(ctk.CTkFrame):
     def _do_delete(self, *, trash: bool) -> None:
         paths = self._collect_delete_paths()
         if not paths:
-            messagebox.showinfo("Удаление", "No files selected.")
+            messagebox.showinfo("Deletion", "No files selected.")
             return
         mode = "to the recycle bin" if trash else "permanently"
         skipped = self._skipped_groups_count()
@@ -1316,7 +1316,7 @@ class DuplicatesPane(ctk.CTkFrame):
             messagebox.showerror("Errors", "\n".join(errors[:20]))
         else:
             reported = deleted_paths if deleted_paths is not None else paths
-            messagebox.showinfo("Готово", f"Deleted: {len(reported)}")
+            messagebox.showinfo("Done", f"Deleted: {len(reported)}")
             self._append_journal_entry(reported, trash=trash)
         self._clear_groups_ui()
         self._groups = []
