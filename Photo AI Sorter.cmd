@@ -14,8 +14,8 @@ if /i "%~1"=="-h"     ( call "%~dp0run.bat" help & exit /b %ERRORLEVEL% )
 if /i "%~1"=="--help" ( call "%~dp0run.bat" help & exit /b %ERRORLEVEL% )
 
 if not exist "%~dp0run.bat" (
-    echo [ОШИБКА] Рядом с этим файлом не найден run.bat.
-    echo Ожидается: "%~dp0run.bat"
+    echo [ERROR] run.bat was not found next to this file.
+    echo Expected: "%~dp0run.bat"
     echo.
     pause
     exit /b 1
@@ -33,9 +33,9 @@ set "PAS_WORKDIR=%~dp0"
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "try { $s = New-Object -ComObject WScript.Shell; $lnk = Join-Path ([Environment]::GetFolderPath('Desktop')) 'Photo AI Sorter.lnk'; $sc = $s.CreateShortcut($lnk); $sc.TargetPath = $env:PAS_TARGET; $sc.WorkingDirectory = $env:PAS_WORKDIR; $sc.IconLocation = $env:SystemRoot + '\System32\imageres.dll,109'; $sc.Description = 'Photo AI Sorter'; $sc.Save() } catch { exit 1 }" >nul 2>&1
 if errorlevel 1 (
-    echo [i] Ярлык на рабочем столе создать не удалось ^(не критично, запуск продолжится^).
+    echo [i] Could not create desktop shortcut (not critical; launch will continue).
 ) else (
-    echo [i] Ярлык «Photo AI Sorter» создан на рабочем столе.
+    echo [i] “Photo AI Sorter” shortcut created on desktop.
 )
 rem Mark done either way so we do not retry on every launch.
 > "%~dp0.desktop_shortcut_done" echo done
