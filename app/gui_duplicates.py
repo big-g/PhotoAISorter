@@ -48,7 +48,7 @@ ACCURACY_PRESET_KEYS: tuple[str, ...] = ("fast", "balanced", "strict", "deep")
 # Large duplicate groups: cap thumbnails per card and paginate the rest in a modal.
 DUP_CARD_MODAL_PAGE = 200
 PERSIST_DEBOUNCE_MS = 350
-# При большем числе файлов удаление выполняется в фоновом потоке, UI обновляется через очередь.
+# For larger file counts, deletion runs in a background thread and the UI is updated through a queue.
 DELETE_PROGRESS_THREAD_THRESHOLD = 500
 
 def _dup_stage_label(stage: str) -> str:
@@ -74,11 +74,11 @@ def _dup_stage_short(stage: str) -> str:
 def _format_eta(seconds: float) -> str:
     seconds = max(0.0, float(seconds))
     if seconds < 60:
-        return f"{int(round(seconds))} с"
+        return f"{int(round(seconds))} s"
     minutes = int(seconds // 60)
     if minutes < 60:
-        return f"{minutes} мин"
-    return f"{minutes // 60} ч {minutes % 60:02d} мин"
+        return f"{minutes} min"
+    return f"{minutes // 60} h {minutes % 60:02d} min"
 
 
 FILTER_TYPE_KEY_TO_LABEL = {
@@ -105,7 +105,7 @@ def _dup_section_label(parent: Any, text: str) -> None:
     )
 
 def _path_same(a: str, b: str) -> bool:
-    """Сравнение путей для «оставить» vs список (Windows / разный регистр / слэши)."""
+    """Сравнение путей для «оставить» vs sписок (Windows / разный регистр / sлэши)."""
     try:
         return Path(a).resolve() == Path(b).resolve()
     except OSError:
@@ -231,7 +231,7 @@ class DuplicatesPane(ctk.CTkFrame):
         )
         row_dup_api = ctk.CTkFrame(llm_dup, fg_color="transparent")
         row_dup_api.pack(fill="x", padx=8, pady=(0, 4))
-        ctk.CTkLabel(row_dup_api, text="Базовый URL:", width=120, anchor="w").pack(side="left")
+        ctk.CTkLabel(row_dup_api, text="Base URL:", width=120, anchor="w").pack(side="left")
         ctk.CTkEntry(row_dup_api, textvariable=self._dup_api_var, placeholder_text="http://host:port").pack(
             side="left", fill="x", expand=True, padx=(0, 8)
         )
@@ -241,7 +241,7 @@ class DuplicatesPane(ctk.CTkFrame):
         self._btn_dup_refresh.pack(side="right")
         row_dup_m = ctk.CTkFrame(llm_dup, fg_color="transparent")
         row_dup_m.pack(fill="x", padx=8, pady=(0, 4))
-        ctk.CTkLabel(row_dup_m, text="Модель (список):", width=120, anchor="w").pack(side="left")
+        ctk.CTkLabel(row_dup_m, text="Model (list):", width=120, anchor="w").pack(side="left")
         self._dup_model_combo = ctk.CTkComboBox(
             row_dup_m,
             values=[ui_t("lm.models.placeholder")],
@@ -253,11 +253,11 @@ class DuplicatesPane(ctk.CTkFrame):
         self._dup_model_combo.pack(side="left", fill="x", expand=True, padx=(0, 8))
         row_dup_man = ctk.CTkFrame(llm_dup, fg_color="transparent")
         row_dup_man.pack(fill="x", padx=8, pady=(0, 4))
-        ctk.CTkLabel(row_dup_man, text="Вручную (приоритет):", width=120, anchor="w").pack(side="left")
+        ctk.CTkLabel(row_dup_man, text="Manual (priority):", width=120, anchor="w").pack(side="left")
         ctk.CTkEntry(
             row_dup_man,
             textvariable=self._dup_model_manual_var,
-            placeholder_text="Если пусто — берётся из списка выше",
+            placeholder_text="Если пусто — берётся из sписка выше",
         ).pack(side="left", fill="x", expand=True)
         row_dup_prof = ctk.CTkFrame(llm_dup, fg_color="transparent")
         row_dup_prof.pack(fill="x", padx=8, pady=(0, 8))
@@ -598,7 +598,7 @@ class DuplicatesPane(ctk.CTkFrame):
 
     def _open_groups_viewer(self) -> None:
         if not self._group_records:
-            messagebox.showinfo("Дубликаты", "Сначала выполните сканирование.")
+            messagebox.showinfo("Duplicates", "Сначала выполните sканирование.")
             return
         if self._viewer_window is not None:
             try:
@@ -668,7 +668,7 @@ class DuplicatesPane(ctk.CTkFrame):
         try:
             workers = max(1, min(max_duplicate_workers(), int(self._workers_var.get().strip())))
         except ValueError:
-            messagebox.showerror("Параметры", f"Воркеры должны быть числом от 1 до {max_duplicate_workers()}")
+            messagebox.showerror("Параметры", f"Workers must be a number from 1 to {max_duplicate_workers()}")
             return None
         base.parallel_workers = workers
         base.keep_policy = self._keep_var.get()  # type: ignore[assignment]
@@ -703,7 +703,7 @@ class DuplicatesPane(ctk.CTkFrame):
     def _apply_duplicate_verifier_profile(self) -> None:
         prof = self._app._model_profiles.get("duplicate_verifier")
         if prof is None:
-            messagebox.showwarning(ui_t("dup.profile.verifier"), "Профиль duplicate_verifier не найден.")
+            messagebox.showwarning(ui_t("dup.profile.verifier"), "duplicate_verifier profile not found.")
             return
         if prof.api_base:
             self._dup_api_var.set(prof.api_base)
@@ -735,7 +735,7 @@ class DuplicatesPane(ctk.CTkFrame):
     def _on_dup_model_combo_change(self) -> None:
         if self._dup_model_manual_var.get().strip():
             self._dup_model_manual_var.set("")
-            self._app._append_log("Дубликаты: ручная модель очищена — используется выбранная из списка.")
+            self._app._append_log("Duplicates: ручная модель очищена — используется выбранная из sписка.")
 
     def _set_dup_probe_busy(self, busy: bool) -> None:
         self._dup_probe_busy = busy
@@ -753,7 +753,7 @@ class DuplicatesPane(ctk.CTkFrame):
             try:
                 models = list_models(base, api_key=self._app._api_key_resolved())
             except Exception as exc:
-                self.after(0, lambda err=exc: self._app._append_log(f"Дубликаты — список моделей: ошибка {err!s}"))
+                self.after(0, lambda err=exc: self._app._append_log(f"Duplicates — sписок моделей: ошибка {err!s}"))
                 self.after(0, lambda: self._set_dup_probe_busy(False))
                 return
 
@@ -762,15 +762,15 @@ class DuplicatesPane(ctk.CTkFrame):
                     self._dup_model_combo.configure(values=models)
                     self._dup_model_var.set(models[0])
                 else:
-                    self._dup_model_combo.configure(values=["— сервер вернул пустой список —"])
+                    self._dup_model_combo.configure(values=["— sервер вернул пустой sписок —"])
                     self._dup_model_var.set(self._dup_model_combo.cget("values")[0])
-                self._app._append_log(f"Дубликаты: загружено моделей: {len(models)}")
+                self._app._append_log(f"Duplicates: загружено моделей: {len(models)}")
                 self._set_dup_probe_busy(False)
 
             self.after(0, apply)
 
         threading.Thread(target=work, daemon=True).start()
-        self._app._append_log("Дубликаты: запрос списка моделей…")
+        self._app._append_log("Duplicates: запрос sписка моделей…")
 
     def dup_settings_dict(self) -> dict[str, Any]:
         o = self._parse_options() or options_from_preset("balanced")
@@ -851,8 +851,8 @@ class DuplicatesPane(ctk.CTkFrame):
             return False, False
 
         res = messagebox.askyesnocancel(
-            "Найден незавершённый прогресс",
-            "Для этой папки уже есть сохранённый прогресс.\n\nДа — продолжить\nНет — начать заново\nОтмена — не запускать",
+            "Unfinished progress found",
+            "Для этой папки уже есть sохранённый прогресс.\n\nДа — продолжить\nНет — начать заново\nОтмена — не запускать",
         )
         if res is None:
             return True, False
@@ -865,7 +865,7 @@ class DuplicatesPane(ctk.CTkFrame):
             return
         root = Path(self._dir_var.get().strip())
         if not root.is_dir():
-            messagebox.showwarning("Папка", "Укажите существующую папку.")
+            messagebox.showwarning("Папка", "Укажите sуществующую папку.")
             return
         opts = self._parse_options()
         if opts is None:
@@ -885,7 +885,7 @@ class DuplicatesPane(ctk.CTkFrame):
         self._scan_started_at = time.monotonic()
         self._scan_had_groups_ready = False
         self._btn_scan.configure(state="disabled")
-        self._btn_pause.configure(state="normal", text="Пауза")
+        self._btn_pause.configure(state="normal", text="Pause")
         self._btn_stop.configure(state="normal")
         self._prog.set(0)
         self._stage_label.configure(text=ui_t("dup.stage.start"))
@@ -905,7 +905,7 @@ class DuplicatesPane(ctk.CTkFrame):
             api_key=self._app._api_key_resolved(),
         )
         self._app._append_log(
-            f"Дубликаты: API={dup_api} | модель={dup_model} | LLM={'ON' if opts.use_llm_pairs else 'OFF'}"
+            f"Duplicates: API={dup_api} | модель={dup_model} | LLM={'ON' if opts.use_llm_pairs else 'OFF'}"
         )
         self._dup_worker.reset_stop()
         self._dup_worker.set_paused(False)
@@ -918,7 +918,7 @@ class DuplicatesPane(ctk.CTkFrame):
         paused = not self._dup_worker.is_paused()
         self._dup_worker.set_paused(paused)
         self._btn_pause.configure(text=ui_t("buttons.resume") if paused else ui_t("buttons.pause"))
-        self._app._append_log("Дубликаты: пауза" if paused else "Дубликаты: продолжение")
+        self._app._append_log("Duplicates: пауза" if paused else "Duplicates: продолжение")
 
     def _on_stop(self) -> None:
         if self._dup_worker:
@@ -928,7 +928,7 @@ class DuplicatesPane(ctk.CTkFrame):
         if self._running:
             return
         if not self._last_records_meta:
-            messagebox.showinfo("Кеш", "Сначала выполните сканирование.")
+            messagebox.showinfo("Cache", "Сначала выполните sканирование.")
             return
         opts = self._parse_options()
         if opts is None:
@@ -936,7 +936,7 @@ class DuplicatesPane(ctk.CTkFrame):
         paths = [Path(m["path"]) for m in self._last_records_meta]
         records = load_records_from_db(paths, self._sig_db, opts)
         if len(records) < 2:
-            messagebox.showinfo("Кеш", "Недостаточно данных в кеше, выполните сканирование.")
+            messagebox.showinfo("Cache", "Недостаточно данных в кеше, выполните sканирование.")
             return
         try:
             mode = MediaScanMode(self._media_mode_var.get())
@@ -1176,7 +1176,7 @@ class DuplicatesPane(ctk.CTkFrame):
         return out
 
     def _delete_scope_summary(self) -> tuple[int, int, int, int]:
-        """(файлов к удалению, групп с удалением, всего групп в скане, групп после фильтров)."""
+        """(файлов к удалению, групп s удалением, всего групп в sкане, групп после фильтров)."""
         paths = self._collect_delete_paths()
         n_groups_del = 0
         for i in range(len(self._group_keep_check_vars)):
@@ -1211,13 +1211,13 @@ class DuplicatesPane(ctk.CTkFrame):
         paths = self._collect_delete_paths()
         if not paths:
             messagebox.showinfo(
-                "Предпросмотр",
-                "Нет файлов к удалению. Утвердите группы (галочка «Утвердить»), настройте «оставить» или «удалить всю группу».",
+                "Preview",
+                "No files marked for deletion. Approve groups (check “Approve”), set keep selections, or choose “Delete entire group”.",
             )
             return
         n_files, n_gr_del, n_gr_tot, n_filt = self._delete_scope_summary()
         top = ctk.CTkToplevel(self)
-        top.title("Предпросмотр удаления")
+        top.title("Preview удаления")
         top.geometry("720x520")
         self._make_modal(top)
         tb = ctk.CTkTextbox(top)
@@ -1225,17 +1225,17 @@ class DuplicatesPane(ctk.CTkFrame):
         skipped = self._skipped_groups_count()
         missing = sum(1 for p in paths if not p.exists())
         header = (
-            f"Сводка\n"
-            f"Файлов к удалению: {n_files}\n"
-            f"Групп с удалением: {n_gr_del} из {n_gr_tot} (всего в скане)\n"
-            f"Групп после фильтров списка: {n_filt}\n"
+            f"Summary\n"
+            f"Files marked for deletion: {n_files}\n"
+            f"Групп s удалением: {n_gr_del} из {n_gr_tot} (всего в sкане)\n"
+            f"Групп после фильтров sписка: {n_filt}\n"
             f"{ui_t('dup.delete.approve_only')}\n"
-            f"Пропущено групп (skip): {skipped}\n"
-            f"Нет на диске: {missing}\n"
+            f"Skipped groups: {skipped}\n"
+            f"Missing on disk: {missing}\n"
             f"{'-' * 48}\n"
         )
         show = paths[:800]
-        tail = "" if len(paths) <= 800 else f"\n… и ещё {len(paths) - 800} путь(ей)"
+        tail = "" if len(paths) <= 800 else f"\n… and {len(paths) - 800} more path(s)"
         tb.insert("1.0", header + "\n".join(str(p) for p in show) + tail)
         tb.configure(state="disabled")
 
@@ -1246,7 +1246,7 @@ class DuplicatesPane(ctk.CTkFrame):
         top.geometry("480x230")
         self._make_modal(top)
         var = ctk.BooleanVar(value=False)
-        ctk.CTkLabel(top, text=f"Будет безвозвратно удалено файлов: {n_files}").pack(padx=16, pady=(16, 8))
+        ctk.CTkLabel(top, text=f"Files to be permanently deleted: {n_files}").pack(padx=16, pady=(16, 8))
         ctk.CTkCheckBox(top, text=ui_t("dup.perm.checkbox"), variable=var).pack(anchor="w", padx=16)
         row = ctk.CTkFrame(top, fg_color="transparent")
         row.pack(pady=20)
@@ -1267,20 +1267,20 @@ class DuplicatesPane(ctk.CTkFrame):
     def _do_delete(self, *, trash: bool) -> None:
         paths = self._collect_delete_paths()
         if not paths:
-            messagebox.showinfo("Удаление", "Нет отмеченных файлов.")
+            messagebox.showinfo("Удаление", "No files selected.")
             return
-        mode = "в корзину" if trash else "безвозвратно"
+        mode = "to the recycle bin" if trash else "permanently"
         skipped = self._skipped_groups_count()
         missing = sum(1 for p in paths if not p.exists())
         n_files, n_gr_del, n_gr_tot, n_filt = self._delete_scope_summary()
         if not messagebox.askyesno(
             ui_t("dup.delete.confirm.title"),
-            f"Удалить {n_files} файл(ов) {mode}?\n\n"
-            f"Групп с удалением: {n_gr_del} из {n_gr_tot} (всего в скане).\n"
-            f"В списке после фильтров: {n_filt} групп.\n"
+            f"Delete {n_files} file(s) {mode}?\n\n"
+            f"Групп s удалением: {n_gr_del} из {n_gr_tot} (всего в sкане).\n"
+            f"В sписке после фильтров: {n_filt} групп.\n"
             f"{ui_t('dup.delete.approve_only')}\n"
-            f"Пропущено групп (skip): {skipped}\n"
-            f"Нет на диске: {missing}\n",
+            f"Skipped groups: {skipped}\n"
+            f"Missing on disk: {missing}\n",
         ):
             return
         if not trash and not self._confirm_permanent_delete(n_files):
@@ -1313,10 +1313,10 @@ class DuplicatesPane(ctk.CTkFrame):
             else:
                 messagebox.showinfo(ui_t("dup.delete.progress_title"), ui_t("dup.delete.cancelled_none"))
         elif errors:
-            messagebox.showerror("Ошибки", "\n".join(errors[:20]))
+            messagebox.showerror("Errors", "\n".join(errors[:20]))
         else:
             reported = deleted_paths if deleted_paths is not None else paths
-            messagebox.showinfo("Готово", f"Удалено: {len(reported)}")
+            messagebox.showinfo("Готово", f"Deleted: {len(reported)}")
             self._append_journal_entry(reported, trash=trash)
         self._clear_groups_ui()
         self._groups = []
@@ -1331,7 +1331,7 @@ class DuplicatesPane(ctk.CTkFrame):
             try:
                 import send2trash
             except ImportError:
-                messagebox.showerror("send2trash", "Установите пакет send2trash.")
+                messagebox.showerror("send2trash", "Install the send2trash package.")
                 return
         else:
             send2trash = None  # type: ignore[assignment]
@@ -1529,7 +1529,7 @@ class DuplicatesPane(ctk.CTkFrame):
         self._make_modal(top)
         tb = ctk.CTkTextbox(top)
         tb.pack(fill="both", expand=True, padx=8, pady=8)
-        tb.insert("1.0", "\n".join(lines) if lines else "Журнал пуст.")
+        tb.insert("1.0", "\n".join(lines) if lines else "Log is empty.")
         tb.configure(state="disabled")
 
     def _refresh_virtualized_groups(self) -> None:
@@ -1810,7 +1810,7 @@ class DuplicatesPane(ctk.CTkFrame):
         action_row.pack(fill="x", padx=10, pady=(8, 6))
         ctk.CTkLabel(
             action_row,
-            text="Визуальное сравнение файлов группы",
+            text="Визуальное sравнение файлов группы",
             text_color=("gray35", "gray65"),
             anchor="w",
         ).pack(side="left", fill="x", expand=True)
@@ -1851,7 +1851,7 @@ class DuplicatesPane(ctk.CTkFrame):
                 return
         f = filedialog.askopenfilename(
             title=ui_t("dup.review.pick_file"),
-            filetypes=[("JSON", "*.json"), ("Все файлы", "*.*")],
+            filetypes=[("JSON", "*.json"), ("All files", "*.*")],
         )
         if f:
             open_duplicate_review_window(self.winfo_toplevel(), Path(f))
