@@ -231,7 +231,7 @@ class DuplicatesPane(ctk.CTkFrame):
         )
         row_dup_api = ctk.CTkFrame(llm_dup, fg_color="transparent")
         row_dup_api.pack(fill="x", padx=8, pady=(0, 4))
-        ctk.CTkLabel(row_dup_api, text="Base URL:", width=120, anchor="w").pack(side="left")
+        ctk.CTkLabel(row_dup_api, text="API Base URL:", width=120, anchor="w").pack(side="left")
         ctk.CTkEntry(row_dup_api, textvariable=self._dup_api_var, placeholder_text="http://host:port").pack(
             side="left", fill="x", expand=True, padx=(0, 8)
         )
@@ -241,7 +241,7 @@ class DuplicatesPane(ctk.CTkFrame):
         self._btn_dup_refresh.pack(side="right")
         row_dup_m = ctk.CTkFrame(llm_dup, fg_color="transparent")
         row_dup_m.pack(fill="x", padx=8, pady=(0, 4))
-        ctk.CTkLabel(row_dup_m, text="Model (list):", width=120, anchor="w").pack(side="left")
+        ctk.CTkLabel(row_dup_m, text="Model (from list):", width=120, anchor="w").pack(side="left")
         self._dup_model_combo = ctk.CTkComboBox(
             row_dup_m,
             values=[ui_t("lm.models.placeholder")],
@@ -253,11 +253,11 @@ class DuplicatesPane(ctk.CTkFrame):
         self._dup_model_combo.pack(side="left", fill="x", expand=True, padx=(0, 8))
         row_dup_man = ctk.CTkFrame(llm_dup, fg_color="transparent")
         row_dup_man.pack(fill="x", padx=8, pady=(0, 4))
-        ctk.CTkLabel(row_dup_man, text="Manual (priority):", width=120, anchor="w").pack(side="left")
+        ctk.CTkLabel(row_dup_man, text="Manual model (priority):", width=120, anchor="w").pack(side="left")
         ctk.CTkEntry(
             row_dup_man,
             textvariable=self._dup_model_manual_var,
-            placeholder_text="If blank, use the list above",
+            placeholder_text="Leave blank to use the model list",
         ).pack(side="left", fill="x", expand=True)
         row_dup_prof = ctk.CTkFrame(llm_dup, fg_color="transparent")
         row_dup_prof.pack(fill="x", padx=8, pady=(0, 8))
@@ -668,7 +668,7 @@ class DuplicatesPane(ctk.CTkFrame):
         try:
             workers = max(1, min(max_duplicate_workers(), int(self._workers_var.get().strip())))
         except ValueError:
-            messagebox.showerror("Settings", f"Workers must be a number from 1 to {max_duplicate_workers()}")
+            messagebox.showerror("Settings", f"Worker count must be between 1 and {max_duplicate_workers()}")
             return None
         base.parallel_workers = workers
         base.keep_policy = self._keep_var.get()  # type: ignore[assignment]
@@ -851,8 +851,8 @@ class DuplicatesPane(ctk.CTkFrame):
             return False, False
 
         res = messagebox.askyesnocancel(
-            "Unfinished progress found",
-            "Saved progress already exists for this folder.\n\nYes — resume\nNo — start over\nCancel — do not start",
+            "Unfinished scan found",
+            "Saved scan progress exists for this folder.\n\nYes — Resume\nNo — Start over\nCancel — Do not start",
         )
         if res is None:
             return True, False
@@ -865,7 +865,7 @@ class DuplicatesPane(ctk.CTkFrame):
             return
         root = Path(self._dir_var.get().strip())
         if not root.is_dir():
-            messagebox.showwarning("Folder", "Specify an existing folder.")
+            messagebox.showwarning("Folder", "Please select an existing folder.")
             return
         opts = self._parse_options()
         if opts is None:
@@ -936,7 +936,7 @@ class DuplicatesPane(ctk.CTkFrame):
         paths = [Path(m["path"]) for m in self._last_records_meta]
         records = load_records_from_db(paths, self._sig_db, opts)
         if len(records) < 2:
-            messagebox.showinfo("Cache", "Insufficient cache data; run a scan.")
+            messagebox.showinfo("Cache", "Not enough cached data. Run a scan first.")
             return
         try:
             mode = MediaScanMode(self._media_mode_var.get())
@@ -1211,8 +1211,8 @@ class DuplicatesPane(ctk.CTkFrame):
         paths = self._collect_delete_paths()
         if not paths:
             messagebox.showinfo(
-                "Preview",
-                "No files marked for deletion. Approve groups (check “Approve”), set keep selections, or choose “Delete entire group”.",
+                "Deletion preview",
+                "No files are marked for deletion. Approve groups (check “Approve”), select files to keep, or choose “Delete entire group.”",
             )
             return
         n_files, n_gr_del, n_gr_tot, n_filt = self._delete_scope_summary()
@@ -1246,7 +1246,7 @@ class DuplicatesPane(ctk.CTkFrame):
         top.geometry("480x230")
         self._make_modal(top)
         var = ctk.BooleanVar(value=False)
-        ctk.CTkLabel(top, text=f"Files to be permanently deleted: {n_files}").pack(padx=16, pady=(16, 8))
+        ctk.CTkLabel(top, text=f"Files to permanently delete: {n_files}").pack(padx=16, pady=(16, 8))
         ctk.CTkCheckBox(top, text=ui_t("dup.perm.checkbox"), variable=var).pack(anchor="w", padx=16)
         row = ctk.CTkFrame(top, fg_color="transparent")
         row.pack(pady=20)
@@ -1267,7 +1267,7 @@ class DuplicatesPane(ctk.CTkFrame):
     def _do_delete(self, *, trash: bool) -> None:
         paths = self._collect_delete_paths()
         if not paths:
-            messagebox.showinfo("Deletion", "No files selected.")
+            messagebox.showinfo("Deletion", "No files selected for deletion.")
             return
         mode = "to the recycle bin" if trash else "permanently"
         skipped = self._skipped_groups_count()
@@ -1316,7 +1316,7 @@ class DuplicatesPane(ctk.CTkFrame):
             messagebox.showerror("Errors", "\n".join(errors[:20]))
         else:
             reported = deleted_paths if deleted_paths is not None else paths
-            messagebox.showinfo("Done", f"Deleted: {len(reported)}")
+            messagebox.showinfo("Complete", f"Files deleted: {len(reported)}")
             self._append_journal_entry(reported, trash=trash)
         self._clear_groups_ui()
         self._groups = []
@@ -1331,7 +1331,7 @@ class DuplicatesPane(ctk.CTkFrame):
             try:
                 import send2trash
             except ImportError:
-                messagebox.showerror("send2trash", "Install the send2trash package.")
+                messagebox.showerror("send2trash", "Install the send2trash package to use the Recycle Bin.")
                 return
         else:
             send2trash = None  # type: ignore[assignment]
@@ -1810,7 +1810,7 @@ class DuplicatesPane(ctk.CTkFrame):
         action_row.pack(fill="x", padx=10, pady=(8, 6))
         ctk.CTkLabel(
             action_row,
-            text="Visual comparison of group files",
+            text="Visual comparison of files in this group",
             text_color=("gray35", "gray65"),
             anchor="w",
         ).pack(side="left", fill="x", expand=True)
