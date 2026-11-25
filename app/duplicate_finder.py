@@ -305,7 +305,7 @@ def _load_image(path: Path, options: DuplicateFinderOptions, on_log: LogFn) -> I
 
 
 def _load_frames_for_signature(path: Path, options: DuplicateFinderOptions, on_log: LogFn) -> tuple[list[Image.Image], bool]:
-    """Возвращает кадры для подписи; второй флаг — нужен ли набор pHash по нескольким кадрам (видео / GIF)."""
+    """Returns frames for signatures; the second flag indicates whether a multi-frame pHash set is needed (video/GIF)."""
     suf = path.suffix.lower()
     n = max(3, options.video_sample_frames)
     try:
@@ -472,7 +472,7 @@ def _multi_frame_phash_mean_dist(
 
 
 def _perceptual_match_records(a: FileDupInfo, b: FileDupInfo, options: DuplicateFinderOptions) -> bool:
-    """Согласование pHash (+ dHash для фото) или среднее по кадрам для видео."""
+    """Matching pHash (+ dHash for photos) or averaged frame hashes for video."""
     if not _likely_candidate(a, b):
         return False
     fa_m = a.phash_frames if a.phash_frames and len(a.phash_frames) >= 2 else None
@@ -739,8 +739,8 @@ def build_groups_from_records(
         max_bucket = max((len(v) for v in buckets.values()), default=0)
         if on_log and max_bucket > 6000:
             on_log(
-                f"Группировка pHash: самая большая корзина размеров — {max_bucket} файлов; "
-                "поиск похожих фото идёт через индекс pHash; видео сравнивается осторожнее по кадрам."
+                f"pHash grouping: the largest size bucket contains {max_bucket} files; "
+                "similar photos are searched using the pHash index; video is compared more cautiously using frame signatures."
             )
         for idxs in buckets.values():
             indexed = [i for i in idxs if not _has_multiframe_signature(records[i])]
@@ -757,8 +757,8 @@ def build_groups_from_records(
                 video_radius = max(options.phash_max_hamming, options.phash_video_mean_max)
                 if on_log and len(multiframe) > 1000:
                     on_log(
-                        f"Группировка видео: {len(multiframe)} файлов в корзине; "
-                        "используется индекс по кадрам вместо полного перебора."
+                        f"Video grouping: {len(multiframe)} files in the bucket; "
+                        "a frame-based index is used instead of exhaustive pairwise comparison."
                     )
                 for ia, ib in _multiframe_candidate_pairs(idxs, records, video_radius):
                     pair = (ia, ib) if ia < ib else (ib, ia)
