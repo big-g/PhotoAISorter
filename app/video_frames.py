@@ -25,8 +25,8 @@ from app.constants import (
     VIDEO_SAMPLE_FRACTIONS,
 )
 
-# Максимум кадров за один проход извлечения (сортировщик сам передаёт VIDEO_FRAME_COUNT;
-# поиск дубликатов может запрашивать больше — их нельзя безусловно резать до 3).
+# Maximum frames extracted in one pass (the sorter passes VIDEO_FRAME_COUNT itself;
+# duplicate detection may request more, so the count must not be hard-capped at 3).
 _MEDIA_EXTRACT_FRAME_CAP = 24
 
 LogFn = Callable[[str], None]
@@ -37,7 +37,7 @@ _WIN_NO_CONSOLE = getattr(subprocess, "CREATE_NO_WINDOW", 0) if os.name == "nt" 
 
 
 def _subprocess_run_common_kw() -> dict[str, object]:
-    """Windows + GUI: без консольного окна у дочерних ffmpeg/ffprobe."""
+    """Windows GUI: prevent child ffmpeg/ffprobe processes from opening a console window."""
     if _WIN_NO_CONSOLE:
         return {"creationflags": _WIN_NO_CONSOLE}
     return {}
@@ -64,8 +64,8 @@ def _spread_frame_indices(total: int, k: int) -> list[int]:
 
 def video_sample_times_sec(duration_sec: float, k: int) -> list[float]:
     """
-    Таймкоды для k кадров по VIDEO_SAMPLE_FRACTIONS (разреженно по длине ролика).
-    Не требует декодирования файла — только метаданные длительности.
+    Time points for k frames using VIDEO_SAMPLE_FRACTIONS (sparse sampling across the video duration).
+    No file decoding is needed—only duration metadata.
     """
     if k <= 0:
         return []
@@ -111,8 +111,8 @@ def _frame_cache_key(path: Path, n: int) -> tuple[str, int, int, int]:
 
 def resolve_ffmpeg_executable() -> str | None:
     """
-    Путь к ffmpeg: PHOTO_AI_SORTER_FFMPEG (файл или папка bin), затем бандл
-    в корне проекта (ffmpeg-runtime\\bin), затем PATH и стандартные каталоги Windows.
+    ffmpeg path: PHOTO_AI_SORTER_FFMPEG (file or bin folder), then the bundled version
+    in the project root (ffmpeg-runtime\\bin), then PATH and standard Windows directories.
     """
     raw = os.environ.get("PHOTO_AI_SORTER_FFMPEG", "").strip().strip('"')
     if raw:
@@ -150,7 +150,7 @@ def resolve_ffmpeg_executable() -> str | None:
 
 
 def resolve_ffprobe_executable() -> str | None:
-    """Рядом с ffmpeg.exe или PHOTO_AI_SORTER_FFPROBE / PATH."""
+    """Located beside ffmpeg.exe, or via PHOTO_AI_SORTER_FFPROBE / PATH."""
     ff = resolve_ffmpeg_executable()
     if ff:
         d = Path(ff).parent
@@ -225,7 +225,7 @@ def diagnose_media_decode(path: Path, n: int = VIDEO_FRAME_COUNT) -> dict[str, o
 
 
 def _ffmpeg_frame_at(path: Path, t_sec: float, ffmpeg: str) -> Image.Image | None:
-    # -ss перед -i: input seek, без прогона с начала; -t ограничивает объём декода
+    # -ss before -i: input seek without decoding from the beginning; -t limits the amount decoded
     cmd = [
         ffmpeg,
         "-hide_banner",
