@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 # Copyright (C) 2026 Photo AI Sorter contributors — see NOTICE
 
-"""Отдельное окно: крупный просмотр групп дубликатов, утверждение и удаление всей группы."""
+"""Separate window for large duplicate-group previews, approval, and whole-group deletion."""
 
 from __future__ import annotations
 
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 VIEWER_THUMB_SIZE = (240, 240)
 _CACHE_LIMIT = 256
 
-# Локальные bind на окно и виджеты (без bind_all / unbind_all по приложению).
+# Local bindings for the window and widgets (no application-wide bind_all / unbind_all).
 _VIEWER_KEY_SEQUENCES = (
     "<Left>",
     "<Right>",
