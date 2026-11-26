@@ -163,7 +163,7 @@ fi
 
 echo "[3/3] Checking environment ..."
 if ! "$PY" -c "import sys; sys.exit(0 if sys.version_info>=(3,10) else 1)"; then
-    echo "[ОШИБКА] Нужен Python 3.10+. Удалите $VENV_DIR и запустите скрипт снова."
+    echo "[ERROR] Python 3.10+ is required. Remove $VENV_DIR and run the script again."
     fail
 fi
 
@@ -172,7 +172,7 @@ fi
     fail
 }
 
-if ! "$PY" -c "import app.gui; import app.gui_duplicates; import app.duplicate_finder; import app.duplicate_worker; import app.signature_db; import app.worker; import app.lm_studio; import app.settings_store; import app.video_frames; print('Проверка импорта: OK')"; then
+if ! "$PY" -c "import app.gui; import app.gui_duplicates; import app.duplicate_finder; import app.duplicate_worker; import app.signature_db; import app.worker; import app.lm_studio; import app.settings_store; import app.video_frames; print('Import check: OK')"; then
     if [ "$IMPORT_REPAIR_DONE" -eq 0 ]; then
         echo "[3/3] Imports failed — recreating $VENV_DIR from scratch ..."
         if ! remove_venv; then
