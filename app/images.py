@@ -33,7 +33,7 @@ def file_sha256(path: Path) -> str:
 
 
 def _pil_to_rgb(im: Image.Image) -> Image.Image:
-    # GIF/PNG palette: через RGBA — стабильнее, чем прямой P→RGB (альфа, подложка).
+    # GIF/PNG palette images: converting through RGBA is more reliable than direct P→RGB conversion (alpha and background handling).
     if im.mode == "P":
         im = im.convert("RGBA")
     if im.mode in ("RGBA", "LA"):
