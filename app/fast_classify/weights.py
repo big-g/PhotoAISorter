@@ -67,7 +67,7 @@ def install_clip_download_patch() -> None:
             return ""
         target_dir = cache_dir or str(clip_cache_dir())
         errors: list[str] = []
-        for use_hf, label in ((False, "прямая ссылка"), (True, "Hugging Face")):
+        for use_hf, label in ((False, "direct URL"), (True, "Hugging Face")):
             try:
                 path = original(cfg, prefer_hf_hub=use_hf, cache_dir=target_dir)
                 if path and os.path.isfile(path):
@@ -75,7 +75,7 @@ def install_clip_download_patch() -> None:
             except Exception as e:
                 errors.append(f"{label}: {e}")
         raise RuntimeError(
-            "Не удалось загрузить веса CLIP (" + "; ".join(errors) + f"). Каталог: {target_dir}"
+            "Failed to download CLIP weights (" + "; ".join(errors) + f"). Cache directory: {target_dir}"
         )
 
     pretrained_mod.download_pretrained = download_pretrained_robust
@@ -104,7 +104,7 @@ def _pretrained_cfg(settings: FastClassifySettings) -> dict[str, Any]:
     cfg = get_pretrained_cfg(model_key, settings.pretrained)
     if not cfg:
         raise RuntimeError(
-            f"Неизвестная пара CLIP: {settings.model_name} / {settings.pretrained}"
+            f"Unknown CLIP model/pretrained pair: {settings.model_name} / {settings.pretrained}"
         )
     return cfg
 
@@ -140,14 +140,14 @@ def _download_url_quiet(
                     pct = min(100, (100 * read) // total)
                     if pct >= last_log_pct + 5:
                         last_log_pct = pct
-                        on_log(f"CLIP: загрузка весов {pct}%…")
+                        on_log(f"CLIP: downloading weights {pct}%…")
 
     if expected_sha_prefix:
         digest = hashlib.sha256(tmp.read_bytes()).hexdigest()
         if not digest.startswith(expected_sha_prefix):
             tmp.unlink(missing_ok=True)
             raise RuntimeError(
-                "SHA256 скачанного файла CLIP не совпадает с ожидаемым"
+                "Downloaded CLIP file SHA256 does not match expected value"
             )
 
     tmp.replace(dest)
@@ -167,17 +167,17 @@ def ensure_clip_weights_file(
     if custom:
         path = Path(custom).expanduser()
         if not path.is_file():
-            raise FileNotFoundError(f"Файл весов CLIP не найден: {path}")
+            raise FileNotFoundError(f"CLIP weights file not found: {path}")
         if on_log:
-            on_log(f"CLIP: веса из файла {path}")
+            on_log(f"CLIP: using weights from file {path}")
         return path.resolve(), cfg
 
     cache = clip_cache_dir()
     url = str(cfg.get("url") or "").strip()
     if not url:
         raise RuntimeError(
-            f"Для тега {settings.pretrained!r} нет прямой ссылки; "
-            "укажите fast_classify.weights_path в настройках."
+            f"No direct URL is available for tag {settings.pretrained!r}; "
+            "set fast_classify.weights_path in settings."
         )
 
     filename = os.path.basename(url)
@@ -185,7 +185,7 @@ def ensure_clip_weights_file(
     min_bytes = _min_weight_bytes(settings.model_name)
     if dest.is_file() and dest.stat().st_size >= min_bytes:
         if on_log:
-            on_log(f"CLIP: веса в кэше ({dest.name})")
+            on_log(f"CLIP: cached weights ({dest.name})")
         return dest, cfg
 
     expected_sha = ""
@@ -196,19 +196,19 @@ def ensure_clip_weights_file(
 
     if on_log:
         on_log(
-            f"CLIP: скачивание {filename} (~{max(1, _MIN_OPENAI_VITB32_BYTES // 1_000_000)} МБ)…"
+            f"CLIP: downloading {filename} (~{max(1, _MIN_OPENAI_VITB32_BYTES // 1_000_000)} MB)…"
         )
     _download_url_quiet(url, dest, expected_sha_prefix=expected_sha, on_log=on_log)
     if on_log:
-        on_log(f"CLIP: веса сохранены в {dest}")
+        on_log(f"CLIP: weights saved to {dest}")
     return dest, cfg
 
 
 def format_clip_load_error(exc: BaseException) -> str:
     cache = clip_cache_dir()
     return (
-        f"Ошибка загрузки CLIP: {exc}\n"
-        f"Кэш весов: {cache}\n"
-        "Скачайте файл .pt вручную (тег openai) и укажите путь в "
-        "fast_classify.weights_path, либо проверьте интернет и права на запись."
+        f"CLIP weight loading error: {exc}\n"
+        f"Weights cache: {cache}\n"
+        "Download the .pt file manually (OpenAI tag) and set its path in "
+        "fast_classify.weights_path, or check your internet connection and write permissions."
     )
